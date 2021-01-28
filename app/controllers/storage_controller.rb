@@ -1,4 +1,5 @@
 class StorageController < ApplicationController
+
   def presigned_post
     data = S3_BUCKET.presigned_post(
       key: "uploads/#{SecureRandom.uuid}/${filename}",
@@ -15,7 +16,9 @@ class StorageController < ApplicationController
       :get,
       expires_in: 3600,
     )
-    puts data
+    # puts data
     render json: { url: data }, status: :ok
+
   end
+
 end
