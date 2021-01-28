@@ -1,13 +1,21 @@
-import React, { Fragment, Suspense, useState } from 'react'
+import React, { Suspense, useState } from 'react'
+import axios from 'axios'
 
 function Upload() {
 
   const [selectedFile, setSelectedFile] = useState()
   const [isSelected, setIsSelected] = useState(false)
+  const [progress, setProgress] = useState(0.0)
 
   const changeHandler = (e) => {
     setSelectedFile(e.target.files[0])
     setIsSelected(true)
+  }
+
+  const onUploadProgress = (e) => {
+    const percent = Math.round((e.loaded * 100) / e.total)
+    console.log(percent)
+    setProgress(percent)
   }
 
   const handleSubmission = async () => {
@@ -15,19 +23,19 @@ function Upload() {
     const payload = await fetch('/storage/presigned_post')
     const jsonPayload = await payload.json()
     const url = jsonPayload.url
+    console.log(url)
     const formData = new FormData()
 
     Object.keys(jsonPayload.fields).forEach(key => formData.append(key, jsonPayload.fields[key]))
     formData.append("file", selectedFile)
 
-    const xml = await fetch(url, { method: 'POST', body: formData })
-    const xmlPayload = await xml.text()
-
-    const uploadURL = new DOMParser().parseFromString(xmlPayload, 'application/xml').getElementsByTagName('Location')[0].textContent
-
-    console.log(uploadURL)
-
-
+    try {
+      const { data } = await axios.post(url, formData, {onUploadProgress} )
+      const uploadURL = new DOMParser().parseFromString(data, 'application/xml').getElementsByTagName('Location')[0].textContent
+      console.log(uploadURL)
+    } catch {
+      console.error(error)
+    }
 
   }
 
