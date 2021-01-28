@@ -6,10 +6,19 @@ function Upload() {
   const [selectedFile, setSelectedFile] = useState()
   const [isSelected, setIsSelected] = useState(false)
   const [progress, setProgress] = useState(0.0)
+  const [filepath, setFilepath] = useState()
 
   const changeHandler = (e) => {
     setSelectedFile(e.target.files[0])
     setIsSelected(true)
+  }
+
+  const setPresignedURL = async (uploadURL) => {
+    const fileURL = new URL(uploadURL)
+    const path = `${fileURL.pathname}`
+    const { data } = await axios.get('/storage/presigned_url', { params: { filepath: path } })
+    console.log(data)
+    setFilepath(data.path)
   }
 
   const onUploadProgress = (e) => {
@@ -30,10 +39,13 @@ function Upload() {
     formData.append("file", selectedFile)
 
     try {
-      const { data } = await axios.post(url, formData, {onUploadProgress} )
+      const { data } = await axios.post(url, formData, { onUploadProgress })
+      console.log(data)
       const uploadURL = new DOMParser().parseFromString(data, 'application/xml').getElementsByTagName('Location')[0].textContent
-      console.log(uploadURL)
-    } catch {
+      await setPresignedURL(uploadURL)
+      // console.log(path)
+      // setFilepath(path)
+    } catch(error) {
       console.error(error)
     }
 
@@ -53,11 +65,25 @@ function Upload() {
     }
   }
 
+  const FilePath = ({ path }) => {
+    if (path !== undefined) {
+      return (
+        <p>
+          <a href={path} target="_blank">Download</a>
+        </p>
+      )
+    } else {
+      return <p></p>
+    }
+  }
+
   return (
     <Suspense fallback={<h1>Fetching URL...</h1>}>
       <input type="file" onChange={changeHandler} />
       <FileDescription file={selectedFile} />
       <button onClick={handleSubmission} disabled={!isSelected}>Upload</button>
+      <p>{progress}%</p>
+      <FilePath path={filepath} />
     </Suspense>
   )
 }
