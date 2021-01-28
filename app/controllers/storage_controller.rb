@@ -6,7 +6,6 @@ class StorageController < ApplicationController
       success_action_status: "201",
       acl: "public-read",
     )
-
     render json: { url: data.url, fields: data.fields }, status: :ok
   end
 
@@ -16,9 +15,7 @@ class StorageController < ApplicationController
       :get,
       expires_in: 3600,
     )
-    # puts data
-    render json: { url: data }, status: :ok
-
+    render json: { path: URI(data).request_uri }, status: :ok
   end
 
 end
