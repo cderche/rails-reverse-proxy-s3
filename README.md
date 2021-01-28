@@ -56,3 +56,7 @@
   - Block public access to buckets and objects granted through any access control lists (ACLs) - On
   - Block public access to buckets and objects granted through new public bucket or access point policies - On
   - Block public and cross-account access to buckets and objects through any public bucket or access point policies - On
+
+## Test file generation
+
+run the command: `mkfile 500m test.pdf` for a 500mb pdf file
