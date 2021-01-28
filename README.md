@@ -1,5 +1,7 @@
 # README
 
+This is an example of a rails app working with [rack-reverse-proxy](https://github.com/waterlink/rack-reverse-proxy). It also includes a React component to upload and download the file.
+
 ## Key files
 
 ### app/controllers/storage_controller
